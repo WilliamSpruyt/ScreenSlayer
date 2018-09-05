@@ -1,0 +1,42 @@
+//new
+var http = require('http').createServer(handler); //require http server, and create server with function handler()
+var fs = require('fs'); //require filesystem module
+var io = require('socket.io')(http) //require socket.io module and pass the http object (server)
+var piblaster = require('pi-blaster.js');
+
+http.listen(8080); //listen to port 8080
+console.log('App Server is listening on port 8080');
+function handler (req, res) { //create server
+  fs.readFile(__dirname + '/public/index.html', function(err, data) { //read file index.html in public folder
+    if (err) {
+      res.writeHead(404, {'Content-Type': 'text/html'}); //display 404 on error
+      return res.end("404 Not Found");
+    }
+    res.writeHead(200, {'Content-Type': 'text/html'}); //write HTML
+    res.write(data); //write data from index.html
+    return res.end();
+  });
+}
+
+io.sockets.on('connection', function (socket) {// WebSocket Connection
+  var lightvalue = 0; //static variable for current status
+ var slidervalue = 0; //static variable for current status
+
+  socket.on('light', function(data) { //get light switch status from client
+    lightvalue = data;
+   console.log(data);
+    if (lightvalue ===0) {
+        piblaster.setPwm(22, 0.145); //turn LED on or off
+    }
+    if (lightvalue ===1) {
+        piblaster.setPwm(22, 0.1); //turn LED on or off
+    }
+  });
+   socket.on('slider', function(data) { //get light switch status from client
+    slidervalue = data/100;
+   console.log(data);
+	if (slidervalue) {
+        piblaster.setPwm(22, slidervalue); //turn LED on or off
+    }
+  });
+});

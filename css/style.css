@@ -1,0 +1,14 @@
+.rect {
+  position: absolute;
+  width: 150px;
+  height: 80px;
+}
+
+.timeout {
+  background: orange;
+}
+
+.anim-frame {
+  top: 100px;
+  background: green;
+}  
